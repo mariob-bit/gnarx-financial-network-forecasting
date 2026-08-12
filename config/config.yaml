@@ -1,0 +1,86 @@
+# ==========================================================================
+# Configurazione centrale della pipeline GNARX (media) + DST-ARCH (varianza)
+# Modifica questo file per cambiare universo titoli, orizzonte, iperparametri.
+# ==========================================================================
+
+data:
+  # Universo di prodotti finanziari, raggruppati per settore GICS-like.
+  # Il raggruppamento viene riusato dal metodo di costruzione del grafo
+  # "sector_network" (rete basata su classificazione industriale).
+  universe:
+    Technology: ["AAPL", "MSFT", "NVDA"]
+    Financials: ["JPM", "BAC", "GS"]
+    Energy: ["XOM", "CVX"]
+    Healthcare: ["JNJ", "PFE"]
+    ConsumerDiscretionary: ["AMZN", "TSLA"]
+    ConsumerStaples: ["PG", "KO"]
+    Industrials: ["BA", "CAT"]
+    EuropeADR: ["SAP", "ASML"]
+
+  start_date: "2015-01-01"
+  end_date: null  # null = oggi
+  price_field: "Close"  # yfinance auto_adjust=True -> Close è già adjusted
+  frequency: "1d"
+
+  macro:
+    # Effective Federal Funds Rate, giornaliero, fonte FRED (nessuna API key richiesta
+    # per il download del CSV pubblico via pandas_datareader).
+    fed_series_id: "DFF"
+    # Tasso sulle operazioni di rifinanziamento principali BCE (fixed rate),
+    # fonte ECB Data Portal (SDMX REST API pubblica).
+    ecb_series_key: "FM.D.U2.EUR.4F.KR.MRR_FR.LEV"
+    ecb_flow_ref: "FM"
+
+graph:
+  correlation_method: "pearson"       # pearson | spearman
+  mst: true                            # Minimum Spanning Tree (Mantegna 1999)
+  pmfg: true                           # Planar Maximally Filtered Graph
+  granger:
+    max_lag: 5
+    alpha: 0.05
+  diebold_yilmaz:
+    var_lag: 2
+    horizon: 10
+  neighbor_weighting: "equal"          # equal | edge_weight
+
+spectral_regime:
+  # Indicatore di regime basato sugli autovalori della matrice di
+  # correlazione rolling (rally/rottura di mercato). Viene aggiunto come
+  # variabile esogena addizionale al GNARX (assieme a Fed/BCE).
+  enabled: true
+  window: 60          # finestra mobile (giorni) per la matrice di correlazione
+  roc_lag: 5           # lag per il rate-of-change di lambda1_share (early warning)
+  fit_hmm: true         # stima HMM Gaussiano a 2 stati (regime normale/stress)
+
+mean_model:
+  # GNAR(P, [R_1, ..., R_P]) con esogene (GNARX): Fed funds rate, tasso BCE,
+  # e indicatore di regime spettrale (lambda1_share, rate-of-change, prob. stress)
+  gnar_order_P: 2
+  gnar_neighbor_orders_R: [2, 1]        # R_p per p = 1..P
+  exog_lags: [1, 5]                     # lag (in giorni) applicati a tutte le esogene
+  benchmark: "AR"                       # benchmark non-network per confronto
+
+variance_model:
+  gngarch:
+    P: 1
+    Q: 1
+    R: [1]
+    M: [1]
+    distribution: "t"                   # normal | t
+  dst_arch:
+    ar_order: 1
+    log_shift_c: 1.0e-6                 # costante per log(eps^2 + c)
+    symmetrize_graph: true              # richiesto per autovettori reali ortonormali
+  benchmark: "GARCH11"                  # benchmark non-network per confronto
+
+backtest:
+  train_window: 300      # osservazioni nella finestra di stima (rolling)
+  test_horizon: 60        # passi out-of-sample da prevedere
+  refit_every: 10          # ristima i modelli ogni N passi (costo computazionale)
+  step_ahead: 1
+
+synthetic_demo:
+  # Usati SOLO da scripts/run_pipeline.py --synthetic per validare la pipeline
+  # quando l'accesso a Yahoo Finance/FRED/ECB non è disponibile.
+  n_obs: 900
+  seed: 42
