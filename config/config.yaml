@@ -17,7 +17,7 @@ data:
     Industrials: ["BA", "CAT"]
     EuropeADR: ["SAP", "ASML"]
 
-  start_date: "2015-01-01"
+  start_date: "2006-01-01"
   end_date: null  # null = oggi
   price_field: "Close"  # yfinance auto_adjust=True -> Close è già adjusted
   frequency: "1d"
