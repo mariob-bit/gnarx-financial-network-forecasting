@@ -3,30 +3,32 @@ src/data/download.py
 =====================
 Acquisizione dei dati reali necessari alla pipeline:
 
-1. Prezzi giornalieri dei prodotti finanziari via `yfinance` (Yahoo Finance).
+1. Prezzi giornalieri dei prodotti finanziari via `yfinance` (Yahoo Finance)[cite: 1].
 2. Effective Federal Funds Rate (tasso Fed) via FRED (`pandas_datareader`,
-   nessuna API key richiesta per la serie pubblica "DFF").
+   nessuna API key richiesta per la serie pubblica "DFF")[cite: 1].
 3. Tasso sulle operazioni di rifinanziamento principali BCE via l'API REST
-   pubblica dell'ECB Data Portal (SDMX-CSV, nessuna API key richiesta).
+   pubblica dell'ECB Data Portal (SDMX-CSV, nessuna API key richiesta)[cite: 1].
 
 NOTA IMPORTANTE
 ----------------
 Queste funzioni richiedono accesso a Internet verso query1/query2.finance.yahoo.com,
-fred.stlouisfed.org e data-api.ecb.europa.eu. In ambienti sandbox con allowlist di
+fred.stlouisfed.org e data-api.ecb.europa.eu[cite: 1]. In ambienti sandbox con allowlist di
 rete ristretta (es. l'ambiente in cui questo repository è stato generato) queste
 chiamate falliranno con un errore di connessione: è un limite dell'ambiente, non
-un bug del codice. Eseguito in locale, in CI (GitHub Actions) o su qualunque
-macchina con accesso Internet standard, il modulo funziona senza modifiche.
+un bug del codice[cite: 1]. Eseguito in locale, in CI (GitHub Actions) o su qualunque
+macchina con accesso Internet standard, il modulo funziona senza modifiche[cite: 1].
 
 Per testare l'intera pipeline senza accesso a Internet, usare
-`src/data/synthetic.py`, che genera dati sintetici con la stessa interfaccia.
+`src/data/synthetic.py`, che genera dati sintetici con la stessa interfaccia[cite: 1].
 """
 from __future__ import annotations
 
+import io
 import logging
 from typing import Dict, List, Optional
 
 import pandas as pd
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -137,16 +139,22 @@ def download_ecb_main_refi_rate(
     viene qui restituita "as-is" (a scalini); l'allineamento a frequenza
     giornaliera con forward-fill avviene in `preprocessing.py`.
     """
-    import io
-    import requests
+    # Gestione del parametro series_key sia nel formato 'FM.D.U2...' che 'D.U2...'
+    if "." in series_key and series_key.startswith("FM."):
+        flow_ref, key = series_key.split(".", 1)
+    elif "." in series_key:
+        flow_ref, key = "FM", series_key
+    else:
+        flow_ref, key = "FM", "D.U2.EUR.4F.KR.MRR_FR.LEV"
 
-    url = f"https://data-api.ecb.europa.eu/service/data/{series_key}"
+    # La struttura SDMX dell'API BCE richiede /service/data/{flowRef}/{key}
+    url = f"https://data-api.ecb.europa.eu/service/data/{flow_ref}/{key}"
     params = {
         "format": "csvdata",
         "startPeriod": start_date,
         "endPeriod": end_date or pd.Timestamp.today().strftime("%Y-%m-%d"),
     }
-    logger.info("Download tasso BCE (serie '%s')...", series_key)
+    logger.info("Download tasso BCE (flowRef: '%s', key: '%s')...", flow_ref, key)
     try:
         resp = requests.get(url, params=params, timeout=30)
         resp.raise_for_status()
