@@ -74,9 +74,9 @@ variance_model:
   benchmark: "GARCH11"                  # benchmark non-network per confronto
 
 backtest:
-  train_window: 300      # osservazioni nella finestra di stima (rolling)
-  test_horizon: 60        # passi out-of-sample da prevedere
-  refit_every: 10          # ristima i modelli ogni N passi (costo computazionale)
+  train_window: 500      # osservazioni nella finestra di stima (rolling)
+  test_horizon: 21        # passi out-of-sample da prevedere
+  refit_every: 5          # ristima i modelli ogni N passi (costo computazionale)
   step_ahead: 1
 
 synthetic_demo:
