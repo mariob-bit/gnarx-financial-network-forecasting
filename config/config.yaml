@@ -74,9 +74,9 @@ variance_model:
   benchmark: "GARCH11"                  # benchmark non-network per confronto
 
 backtest:
-  train_window: 500      # osservazioni nella finestra di stima (rolling)
-  test_horizon: 21        # passi out-of-sample da prevedere
-  refit_every: 5          # ristima i modelli ogni N passi (costo computazionale)
+  train_window: 750       # invece di 500: più stabilità nella stima GNARX/DST-ARCH
+  test_horizon: 500        # invece di 21: ~2 anni di trading, attraversa più regimi di mercato
+  refit_every: 15           # invece di 5: meno refit costosi (vedi sotto)
   step_ahead: 1
 
 synthetic_demo:
