@@ -7,16 +7,15 @@ data:
   # Universo di prodotti finanziari, raggruppati per settore GICS-like.
   # Il raggruppamento viene riusato dal metodo di costruzione del grafo
   # "sector_network" (rete basata su classificazione industriale).
-universe: 
-    Technology: ["PLAB", "POWI", "SLAB", "VECO", "SANM", "ALRM"],
-    Financials: ["CFR", "EWBC", "SF", "WAL", "PACW", "FHN"],
-    Energy: ["MTDR", "CPE", "CIVI", "SM"],
-    Healthcare: ["EXAS", "ICUI", "RGEN", "PACB"],
-    ConsumerDiscretionary: ["CROX", "SHOO", "LEVI", "BOOT"],
-    ConsumerStaples: ["CALM", "FLO", "CENT", "JJSF"],
-    Industrials: ["AAON", "HEES", "TTC", "AIMC"],
+  universe:
+    Technology: ["PLAB", "POWI", "SLAB", "VECO", "SANM", "ALRM"]
+    Financials: ["CFR", "EWBC", "SF", "WAL", "PACW", "FHN"]
+    Energy: ["MTDR", "CPE", "CIVI", "SM"]
+    Healthcare: ["EXAS", "ICUI", "RGEN", "PACB"]
+    ConsumerDiscretionary: ["CROX", "SHOO", "LEVI", "BOOT"]
+    ConsumerStaples: ["CALM", "FLO", "CENT", "JJSF"]
+    Industrials: ["AAON", "HEES", "TTC", "AIMC"]
     EuropeADR: ["ASND", "ITRN", "EGO", "FVRR"]
-
 
   start_date: "2006-01-01"
   end_date: null  # null = oggi
