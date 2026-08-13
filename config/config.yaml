@@ -7,15 +7,16 @@ data:
   # Universo di prodotti finanziari, raggruppati per settore GICS-like.
   # Il raggruppamento viene riusato dal metodo di costruzione del grafo
   # "sector_network" (rete basata su classificazione industriale).
-  universe:
-    Technology: ["AAPL", "MSFT", "NVDA"]
-    Financials: ["JPM", "BAC", "GS"]
-    Energy: ["XOM", "CVX"]
-    Healthcare: ["JNJ", "PFE"]
-    ConsumerDiscretionary: ["AMZN", "TSLA"]
-    ConsumerStaples: ["PG", "KO"]
-    Industrials: ["BA", "CAT"]
-    EuropeADR: ["SAP", "ASML"]
+universe: 
+    Technology: ["PLAB", "POWI", "SLAB", "VECO", "SANM", "ALRM"],
+    Financials: ["CFR", "EWBC", "SF", "WAL", "PACW", "FHN"],
+    Energy: ["MTDR", "CPE", "CIVI", "SM"],
+    Healthcare: ["EXAS", "ICUI", "RGEN", "PACB"],
+    ConsumerDiscretionary: ["CROX", "SHOO", "LEVI", "BOOT"],
+    ConsumerStaples: ["CALM", "FLO", "CENT", "JJSF"],
+    Industrials: ["AAON", "HEES", "TTC", "AIMC"],
+    EuropeADR: ["ASND", "ITRN", "EGO", "FVRR"]
+
 
   start_date: "2006-01-01"
   end_date: null  # null = oggi
